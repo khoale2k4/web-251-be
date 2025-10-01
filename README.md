@@ -2,14 +2,14 @@
 
 ## Yêu cầu
 - PHP >= 8.x
-- MySQL/MariaDB (nếu dự án có sử dụng database)
+- MySQL
 
 ## Cách chạy dự án
 
 1. **Clone hoặc copy dự án về máy**
    ```
-   git clone <repository-url>
-   cd <ten-thu-muc-du-an>
+   git clone https://github.com/khoale2k4/web-251-be.git
+   cd web-251-be
    ```
 2. **Chạy server PHP built-in**
     ```
@@ -20,8 +20,15 @@
     ```
     http://localhost:8000
     ```
+    
+    Nếu trả về kết quả sau là thành công:
+   ```
+   {
+     "success": true
+   }
+   ```
 
-3. **Cấu hình database**
+4. **Cấu hình database**
 
     - Thông tin kết nối database được định nghĩa trong file:
     ```
@@ -39,7 +46,7 @@
 
 ## Cấu trúc thư mục
 ```
-.
+./web-251-be/
 ├── config/
 │   └── database.php
 ├── public/ (nếu có)
