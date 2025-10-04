@@ -1,26 +1,33 @@
 <?php
+require_once __DIR__ . '/../models/UserModel.php';
 
 class UserService {
-    private $pdo;
+    private $userModel;
 
     public function __construct($pdo) {
-        $this->pdo = $pdo;
+        // Khởi tạo model với PDO
+        $this->userModel = new UserModel($pdo);
     }
 
     public function getAllUsers() {
-        $stmt = $this->pdo->query("SELECT * FROM users");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->userModel->getAll();
     }
 
     public function getUserById($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        return $this->userModel->getById($id);
     }
 
     public function createUser($name, $email) {
-        $stmt = $this->pdo->prepare("INSERT INTO users (name, email) VALUES (?, ?)");
-        $stmt->execute([$name, $email]);
-        return $this->pdo->lastInsertId();
+        // Validate logic trước khi tạo
+        if (empty($name) || empty($email)) {
+            throw new Exception("Name and email are required");
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception("Invalid email format");
+        }
+
+        // Gọi model để thêm user
+        return $this->userModel->create($name, $email);
     }
 }

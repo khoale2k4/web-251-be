@@ -44,6 +44,12 @@
     database
     ```
 
+    - Lưu ý import file SQL trước khi chạy, nhớ tạo Database (ví dụ my_database) trước
+    ```
+    mysql -u root -p my_database < ./web.sql
+    ```
+    Hoặc dùng các phần mềm cung cấp giao diện như BeeKeeper, PostgreSQL hoặc MySQL Workbench
+
 ## Cấu trúc thư mục
 ```
 ./web-251-be/
@@ -53,4 +59,5 @@
 ├── src/ hoặc app/
 ├── index.php
 └── README.md
+└── web.sql
 ```

@@ -1,0 +1,2 @@
+<?php
+// ResponseHelper utility
