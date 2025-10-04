@@ -49,15 +49,3 @@
     mysql -u root -p my_database < ./web.sql
     ```
     Hoặc dùng các phần mềm cung cấp giao diện như BeeKeeper, PostgreSQL hoặc MySQL Workbench
-
-## Cấu trúc thư mục
-```
-./web-251-be/
-├── config/
-│   └── database.php
-├── public/ (nếu có)
-├── src/ hoặc app/
-├── index.php
-└── README.md
-└── web.sql
-```
