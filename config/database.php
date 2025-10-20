@@ -1,12 +1,12 @@
 <?php
 function getPDO() {
     $host = "localhost";
-    $db   = "demo_db";
+    $db   = "shoe_store";
     $user = "root";
     $pass = "";
 
     try {
-        $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+        $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $pdo;
     } catch (Exception $e) {
