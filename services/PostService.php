@@ -2,17 +2,20 @@
 
 require_once __DIR__ . '/../models/Post.php';
 
-class PostService {
+class PostService
+{
     private $postModel;
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         $this->postModel = new Post($pdo);
     }
 
     /**
      * Lấy danh sách bài viết (có tìm kiếm & phân trang)
      */
-    public function getPosts($page = 1, $limit = 10, $search = null) {
+    public function getPosts($page = 1, $limit = 10, $search = null)
+    {
         try {
             $offset = ($page - 1) * $limit;
             $data = $this->postModel->getAll($limit, $offset, $search);
@@ -32,7 +35,8 @@ class PostService {
     /**
      * Lấy chi tiết bài viết theo ID
      */
-    public function getPost($id) {
+    public function getPost($id)
+    {
         $post = $this->postModel->getById($id);
 
         if (!$post) {
@@ -45,7 +49,8 @@ class PostService {
     /**
      * Tạo bài viết mới
      */
-    public function createPost($data) {
+    public function createPost($data)
+    {
         try {
             // Validate cơ bản
             if (empty($data['title']) || empty($data['content'])) {
@@ -77,13 +82,35 @@ class PostService {
     /**
      * Cập nhật bài viết
      */
-    public function updatePost($id, $data) {
+    public function updatePost($id, $data)
+    {
         try {
-            if (empty($data['title']) || empty($data['content'])) {
-                return ['success' => false, 'message' => 'Vui lòng nhập tiêu đề và nội dung'];
+            // Lấy bài viết hiện tại
+            $existingPost = $this->postModel->getById($id);
+            if (!$existingPost) {
+                return ['success' => false, 'message' => 'Không tìm thấy bài viết'];
             }
 
-            $this->postModel->update($id, $data);
+            // Giữ lại dữ liệu cũ nếu request không có field tương ứng
+            $updateData = [
+                'title'   => isset($data['title']) && trim($data['title']) !== ''
+                    ? trim($data['title'])
+                    : $existingPost['title'],
+                'content' => isset($data['content']) && trim($data['content']) !== ''
+                    ? trim($data['content'])
+                    : $existingPost['content'],
+                'image'   => isset($data['image']) && trim($data['image']) !== ''
+                    ? trim($data['image'])
+                    : $existingPost['image'],
+                'author_id' => isset($data['author_id']) && !empty($data['author_id'])
+                    ? (int)$data['author_id']
+                    : $existingPost['author_id']
+            ];
+
+            // Cập nhật vào DB
+            $this->postModel->update($id, $updateData);
+
+            // Lấy lại bài viết sau khi cập nhật
             $updatedPost = $this->postModel->getById($id);
 
             return [
@@ -96,10 +123,12 @@ class PostService {
         }
     }
 
+
     /**
      * Xóa bài viết
      */
-    public function deletePost($id) {
+    public function deletePost($id)
+    {
         try {
             $this->postModel->delete($id);
             return ['success' => true, 'message' => 'Xoá bài viết thành công'];
@@ -108,5 +137,3 @@ class PostService {
         }
     }
 }
-
-?>

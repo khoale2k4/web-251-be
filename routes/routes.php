@@ -64,8 +64,15 @@ function routeRequest($request, $pdo)
         return;
     }
 
-    // Comment
+    // Comment (for posts)
     if (str_starts_with($request, "/comments")) {
+        $controller = new CommentController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Comment (for products)
+    if (str_starts_with($request, "/product-comments")) {
         $controller = new CommentController($pdo);
         $controller->handleRequest($request);
         return;

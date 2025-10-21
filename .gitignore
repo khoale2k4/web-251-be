@@ -90,4 +90,8 @@ coverage/
 /config/database.php
 web.sql
 data.sql
+
+#Swagger
+swagger.json
+/swagger/
 # End of .gitignore
