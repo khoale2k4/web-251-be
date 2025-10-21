@@ -1,21 +1,57 @@
 <?php
 
-class Cart {
+class Cart
+{
     private $pdo;
-    
-    public function __construct($pdo) {
+
+    public function __construct($pdo)
+    {
         $this->pdo = $pdo;
     }
-    
+
+    /**
+     * Lấy tất cả giỏ hàng (admin)
+     */
+    public function getAllCarts($limit = 50, $offset = 0)
+    {
+        $limit = (int) $limit;
+        $offset = (int) $offset;
+
+        $sql = "
+        SELECT 
+            c.id AS cart_id,
+            c.created_at,
+            c.updated_at,
+            u.id AS user_id,
+            u.name AS user_name,
+            u.email AS user_email,
+            COUNT(ci.id) AS total_items,
+            COALESCE(SUM(p.price * ci.quantity), 0) AS total_value
+        FROM carts c
+        LEFT JOIN users u ON c.user_id = u.id
+        LEFT JOIN cart_items ci ON c.id = ci.cart_id
+        LEFT JOIN products p ON ci.product_id = p.id
+        GROUP BY c.id, u.id, u.name, u.email, c.created_at, c.updated_at
+        ORDER BY c.created_at DESC
+        LIMIT $limit OFFSET $offset
+    ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     /**
      * Lấy giỏ hàng của user (hoặc tạo mới nếu chưa có)
      */
-    public function getOrCreateCart($userId) {
+    public function getOrCreateCart($userId)
+    {
         // Tìm cart hiện tại
         $stmt = $this->pdo->prepare("SELECT * FROM carts WHERE user_id = ?");
         $stmt->execute([$userId]);
         $cart = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$cart) {
             // Tạo cart mới
             $stmt = $this->pdo->prepare(
@@ -23,7 +59,7 @@ class Cart {
             );
             $stmt->execute([$userId]);
             $cartId = $this->pdo->lastInsertId();
-            
+
             return [
                 'id' => $cartId,
                 'user_id' => $userId,
@@ -31,14 +67,15 @@ class Cart {
                 'updated_at' => date('Y-m-d H:i:s')
             ];
         }
-        
+
         return $cart;
     }
-    
+
     /**
      * Lấy tất cả items trong giỏ hàng kèm thông tin sản phẩm
      */
-    public function getCartItems($cartId) {
+    public function getCartItems($cartId)
+    {
         $stmt = $this->pdo->prepare("
             SELECT 
                 ci.id,
@@ -61,18 +98,19 @@ class Cart {
         $stmt->execute([$cartId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     /**
      * Thêm sản phẩm vào giỏ hàng
      */
-    public function addItem($cartId, $productId, $quantity = 1) {
+    public function addItem($cartId, $productId, $quantity = 1)
+    {
         // Kiểm tra xem sản phẩm đã có trong giỏ chưa
         $stmt = $this->pdo->prepare(
             "SELECT * FROM cart_items WHERE cart_id = ? AND product_id = ?"
         );
         $stmt->execute([$cartId, $productId]);
         $existing = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if ($existing) {
             // Cập nhật số lượng
             $newQuantity = $existing['quantity'] + $quantity;
@@ -90,42 +128,46 @@ class Cart {
             return $this->pdo->lastInsertId();
         }
     }
-    
+
     /**
      * Cập nhật số lượng sản phẩm trong giỏ
      */
-    public function updateItemQuantity($cartItemId, $quantity) {
+    public function updateItemQuantity($cartItemId, $quantity)
+    {
         if ($quantity <= 0) {
             // Nếu số lượng <= 0, xóa luôn
             return $this->removeItem($cartItemId);
         }
-        
+
         $stmt = $this->pdo->prepare(
             "UPDATE cart_items SET quantity = ? WHERE id = ?"
         );
         return $stmt->execute([$quantity, $cartItemId]);
     }
-    
+
     /**
      * Xóa sản phẩm khỏi giỏ hàng
      */
-    public function removeItem($cartItemId) {
+    public function removeItem($cartItemId)
+    {
         $stmt = $this->pdo->prepare("DELETE FROM cart_items WHERE id = ?");
         return $stmt->execute([$cartItemId]);
     }
-    
+
     /**
      * Xóa toàn bộ giỏ hàng
      */
-    public function clearCart($cartId) {
+    public function clearCart($cartId)
+    {
         $stmt = $this->pdo->prepare("DELETE FROM cart_items WHERE cart_id = ?");
         return $stmt->execute([$cartId]);
     }
-    
+
     /**
      * Lấy tổng giá trị giỏ hàng
      */
-    public function getCartTotal($cartId) {
+    public function getCartTotal($cartId)
+    {
         $stmt = $this->pdo->prepare("
             SELECT 
                 SUM(p.price * (100 - p.discount) / 100 * ci.quantity) as total
@@ -137,11 +179,12 @@ class Cart {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result['total'] ?? 0;
     }
-    
+
     /**
      * Kiểm tra xem cart item có thuộc về cart không
      */
-    public function isCartItemBelongsToCart($cartItemId, $cartId) {
+    public function isCartItemBelongsToCart($cartItemId, $cartId)
+    {
         $stmt = $this->pdo->prepare(
             "SELECT COUNT(*) as count FROM cart_items WHERE id = ? AND cart_id = ?"
         );
