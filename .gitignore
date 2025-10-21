@@ -87,5 +87,7 @@ coverage/
 /laragon.ini
 
 #SQL
+/config/database.php
 web.sql
+data.sql
 # End of .gitignore
