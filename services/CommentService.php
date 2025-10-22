@@ -1,111 +1,65 @@
 <?php
-
 require_once __DIR__ . '/../models/Comment.php';
 
-class CommentService
-{
-    private $commentModel;
+class CommentService {
     private $pdo;
 
-    public function __construct($pdo)
-    {
+    public function __construct($pdo) {
         $this->pdo = $pdo;
-        $this->commentModel = new Comment($pdo);
     }
 
-    /**
-     * Lấy danh sách bình luận theo post_id
-     */
-    public function getCommentsByPost($postId)
-    {
-        try {
-            $comments = $this->commentModel->getByPostId($postId);
-            return ['success' => true, 'data' => $comments];
-        } catch (Exception $e) {
-            return ['success' => false, 'message' => 'Không thể lấy bình luận: ' . $e->getMessage()];
+    // Lấy tất cả bình luận (hoặc lọc theo post_id / product_id)
+    public function getAll($type = 'post', $filterId = null) {
+        if ($type === 'product') {
+            $query = "SELECT c.*, u.name AS user_name, p.name AS product_name 
+                      FROM comments c
+                      JOIN users u ON c.user_id = u.id
+                      JOIN products p ON c.product_id = p.id
+                      WHERE c.comment_type = 'product'";
+            if ($filterId) $query .= " AND c.product_id = :filterId";
+        } else {
+            $query = "SELECT c.*, u.name AS user_name, ps.title AS post_title 
+                      FROM comments c
+                      JOIN users u ON c.user_id = u.id
+                      JOIN posts ps ON c.post_id = ps.id
+                      WHERE c.comment_type = 'post'";
+            if ($filterId) $query .= " AND c.post_id = :filterId";
         }
-    }
-    /**
-     * Lấy danh sách bình luận theo product_id
-     */
-    public function getCommentsByProduct($productId)
-    {
-        try {
-            $comments = $this->commentModel->getByProductId($productId);
-            return ['success' => true, 'data' => $comments];
-        } catch (Exception $e) {
-            return ['success' => false, 'message' => 'Không thể lấy bình luận sản phẩm: ' . $e->getMessage()];
-        }
-    }
 
+        $stmt = $this->pdo->prepare($query);
+        if ($filterId) $stmt->bindValue(':filterId', $filterId, PDO::PARAM_INT);
+        $stmt->execute();
 
-
-    /**
-     * Tạo bình luận mới
-     */
-    public function createComment($data)
-    {
-        try {
-            if (empty($data['content']) || strlen(trim($data['content'])) < 3) {
-                return ['success' => false, 'message' => 'Bình luận quá ngắn'];
-            }
-
-            // Chống spam (ví dụ 1 user không gửi >1 bình luận giống nhau trong 30 giây)
-            // -> Có thể thêm kiểm tra bằng bảng log hoặc session nếu cần sau này.
-
-            // Server-side validation: user must exist
-            require_once __DIR__ . '/../models/UserModel.php';
-            $userModel = new UserModel($this->pdo);
-            if (empty($data['user_id']) || !$userModel->getById((int)$data['user_id'])) {
-                return ['success' => false, 'message' => 'User không tồn tại'];
-            }
-
-            // If product comment, ensure product exists
-            if (isset($data['comment_type']) && $data['comment_type'] === 'product') {
-                require_once __DIR__ . '/../models/Product.php';
-                $productModel = new Product($this->pdo);
-                if (empty($data['product_id']) || !$productModel->exists((int)$data['product_id'])) {
-                    return ['success' => false, 'message' => 'Product không tồn tại'];
-                }
-            }
-
-            // If post comment, ensure post exists
-            if (!isset($data['comment_type']) || $data['comment_type'] === 'post') {
-                require_once __DIR__ . '/../models/Post.php';
-                $postModel = new Post($this->pdo);
-                if (empty($data['post_id']) || !$postModel->getById((int)$data['post_id'])) {
-                    return ['success' => false, 'message' => 'Post không tồn tại'];
-                }
-            }
-
-            $insertId = $this->commentModel->create($data);
-            if ($insertId) {
-                $created = $this->commentModel->getById($insertId);
-                // Normalize fields so post_id/product_id/rating/comment_type always exist
-                $created['post_id'] = array_key_exists('post_id', $created) ? $created['post_id'] : null;
-                $created['product_id'] = array_key_exists('product_id', $created) ? $created['product_id'] : null;
-                $created['rating'] = array_key_exists('rating', $created) ? $created['rating'] : null;
-                $created['comment_type'] = array_key_exists('comment_type', $created) ? $created['comment_type'] : null;
-
-                return ['success' => true, 'message' => 'Gửi bình luận thành công', 'data' => $created];
-            }
-            return ['success' => false, 'message' => 'Không thể lưu bình luận'];
-        } catch (Exception $e) {
-            return ['success' => false, 'message' => 'Không thể thêm bình luận: ' . $e->getMessage()];
-        }
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Xoá bình luận (ẩn hoặc xóa thật)
-     */
-    public function deleteComment($id)
-    {
-        try {
-            // Nếu muốn "ẩn" thay vì xóa, có thể thêm cột `is_hidden` trong DB
-            $this->commentModel->delete($id);
-            return ['success' => true, 'message' => 'Đã xoá bình luận'];
-        } catch (Exception $e) {
-            return ['success' => false, 'message' => 'Lỗi khi xoá bình luận: ' . $e->getMessage()];
-        }
+    // Lấy chi tiết 1 bình luận
+    public function getById($id) {
+        $stmt = $this->pdo->prepare("SELECT * FROM comments WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // Tạo bình luận mới
+    public function create($data) {
+        $stmt = $this->pdo->prepare("
+            INSERT INTO comments (user_id, comment_type, product_id, post_id, content, rating, created_at)
+            VALUES (:user_id, :comment_type, :product_id, :post_id, :content, :rating, NOW())
+        ");
+        $stmt->execute([
+            ':user_id' => $data['user_id'],
+            ':comment_type' => $data['comment_type'],
+            ':product_id' => $data['product_id'] ?? null,
+            ':post_id' => $data['post_id'] ?? null,
+            ':content' => $data['content'],
+            ':rating' => $data['rating'] ?? null,
+        ]);
+        return $this->pdo->lastInsertId();
+    }
+
+    // Xóa bình luận
+    public function delete($id) {
+        $stmt = $this->pdo->prepare("DELETE FROM comments WHERE id = ?");
+        return $stmt->execute([$id]);
     }
 }

@@ -64,14 +64,14 @@ function routeRequest($request, $pdo)
         return;
     }
 
-    // Comment (for posts)
+    // Comments cho bài viết
     if (str_starts_with($request, "/comments")) {
         $controller = new CommentController($pdo);
         $controller->handleRequest($request);
         return;
     }
 
-    // Comment (for products)
+    // Comments cho sản phẩm
     if (str_starts_with($request, "/product-comments")) {
         $controller = new CommentController($pdo);
         $controller->handleRequest($request);

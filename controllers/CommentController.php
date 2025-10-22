@@ -1,51 +1,59 @@
 <?php
-
 require_once __DIR__ . '/../services/CommentService.php';
 
 class CommentController
 {
-    private $commentService;
+    private $service;
 
     public function __construct($pdo)
     {
-        $this->commentService = new CommentService($pdo);
+        $this->service = new CommentService($pdo);
     }
 
     public function handleRequest($request)
     {
         $method = $_SERVER['REQUEST_METHOD'];
-        $query = $_GET;
 
-        if ($method === 'GET') {
-            if (str_starts_with($request, '/product-comments') && isset($query['product_id'])) {
-                $response = $this->commentService->getCommentsByProduct($query['product_id']);
-            } elseif (str_starts_with($request, '/comments') && isset($query['post_id'])) {
-                $response = $this->commentService->getCommentsByPost($query['post_id']);
-            } else {
-                http_response_code(400);
-                echo json_encode(['success' => false, 'message' => 'Thiếu tham số post_id hoặc product_id']);
-                return;
-            }
-
-            echo json_encode($response);
-            return;
+        if (preg_match('#^/product-comments#', $request)) {
+            $type = 'product';
+        } else {
+            $type = 'post';
         }
 
-        if ($method === 'POST') {
-            $data = json_decode(file_get_contents('php://input'), true);
-            $response = $this->commentService->createComment($data);
-            echo json_encode($response);
-            return;
-        }
+        switch ($method) {
+            case 'GET':
+                $filterId = $_GET['id'] ?? null;
+                $comments = $this->service->getAll($type, $filterId);
+                echo json_encode($comments);
+                break;
 
-        if ($method === 'DELETE' && preg_match("#^/comments/(\d+)$#", $request, $matches)) {
-            $id = $matches[1];
-            $response = $this->commentService->deleteComment($id);
-            echo json_encode($response);
-            return;
-        }
+            case 'POST':
+                $data = json_decode(file_get_contents('php://input'), true);
+                if (empty($data['content'])) {
+                    http_response_code(400);
+                    echo json_encode(["error" => "Nội dung bình luận không được để trống"]);
+                    return;
+                }
+                $data['comment_type'] = $type;
+                $id = $this->service->create($data);
+                echo json_encode(["message" => "Đã thêm bình luận", "id" => $id]);
+                break;
 
-        http_response_code(404);
-        echo json_encode(['error' => 'Not found']);
+            case 'DELETE':
+                $id = $_GET['id'] ?? null;
+                if (!$id) {
+                    http_response_code(400);
+                    echo json_encode(["error" => "Thiếu ID bình luận"]);
+                    return;
+                }
+                $this->service->delete($id);
+                echo json_encode(["message" => "Đã xóa bình luận"]);
+                break;
+
+            default:
+                http_response_code(405);
+                echo json_encode(["error" => "Phương thức không được hỗ trợ"]);
+                break;
+        }
     }
 }
