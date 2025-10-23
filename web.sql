@@ -3,6 +3,8 @@
 --  AUTHOR: Tran Khoa & Team
 --  DESCRIPTION: Website bán giày - PHP & MySQL
 -- ===========================================
+-- Xóa database nếu đã tồn tại
+DROP DATABASE IF EXISTS shoe_store;
 
 -- 1️⃣ Tạo database
 CREATE DATABASE IF NOT EXISTS shoe_store CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

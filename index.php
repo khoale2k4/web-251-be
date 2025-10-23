@@ -21,5 +21,5 @@ $pdo = getPDO();
 // Gọi router
 require_once __DIR__ . '/routes/routes.php';
 
-$request = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$request = str_replace('/web-251-be', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
 routeRequest($request, $pdo);
