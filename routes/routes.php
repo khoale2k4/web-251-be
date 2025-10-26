@@ -1,14 +1,16 @@
 <?php
 
-require_once __DIR__ . './../controllers/HealthCheckController.php';
-require_once __DIR__ . './../controllers/UploadController.php';
-require_once __DIR__ . './../controllers/UserController.php';
-require_once __DIR__ . './../controllers/CartController.php';
-require_once __DIR__ . './../controllers/OrderController.php';
-require_once __DIR__ . './../controllers/ProductController.php';
-require_once __DIR__ . './../controllers/ProductCategoryController.php';
+require_once __DIR__ . '/../controllers/HealthCheckController.php';
+require_once __DIR__ . '/../controllers/UploadController.php';
+require_once __DIR__ . '/../controllers/UserController.php';
+require_once __DIR__ . '/../controllers/CartController.php';
+require_once __DIR__ . '/../controllers/OrderController.php';
+require_once __DIR__ . '/../controllers/ProductController.php';
+require_once __DIR__ . '/../controllers/PostController.php';
+require_once __DIR__ . '/../controllers/CommentController.php';
 
-function routeRequest($request, $pdo) {
+function routeRequest($request, $pdo)
+{
     if ($request === "/favicon.ico") {
         exit;
     }
@@ -58,6 +60,27 @@ function routeRequest($request, $pdo) {
     // Order
     if (str_starts_with($request, "/orders")) {
         $controller = new OrderController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Post
+    if (str_starts_with($request, "/posts")) {
+        $controller = new PostController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Comments cho bài viết
+    if (str_starts_with($request, "/comments")) {
+        $controller = new CommentController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Comments cho sản phẩm
+    if (str_starts_with($request, "/product-comments")) {
+        $controller = new CommentController($pdo);
         $controller->handleRequest($request);
         return;
     }

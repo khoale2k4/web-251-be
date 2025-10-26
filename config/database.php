@@ -3,7 +3,7 @@ function getPDO() {
     $host = "localhost";
     $db   = "shoe_store";
     $user = "root";
-    $pass = "";
+    $pass = "12345";
 
     try {
         $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
