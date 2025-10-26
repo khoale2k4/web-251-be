@@ -6,6 +6,7 @@ require_once __DIR__ . './../controllers/UserController.php';
 require_once __DIR__ . './../controllers/CartController.php';
 require_once __DIR__ . './../controllers/OrderController.php';
 require_once __DIR__ . './../controllers/ProductController.php';
+require_once __DIR__ . './../controllers/ProductCategoryController.php';
 
 function routeRequest($request, $pdo) {
     if ($request === "/favicon.ico") {
@@ -29,6 +30,13 @@ function routeRequest($request, $pdo) {
     // User
     if (str_starts_with($request, "/users")) {
         $controller = new UserController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Category (đặt trước Product để tránh conflict với /products/category/{id})
+    if (str_starts_with($request, "/categories")) {
+        $controller = new ProductCategoryController($pdo);
         $controller->handleRequest($request);
         return;
     }
