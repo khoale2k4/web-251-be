@@ -8,6 +8,7 @@ require_once __DIR__ . '/../controllers/OrderController.php';
 require_once __DIR__ . '/../controllers/ProductController.php';
 require_once __DIR__ . '/../controllers/PostController.php';
 require_once __DIR__ . '/../controllers/CommentController.php';
+require_once __DIR__ . '/../controllers/ProductCategoryController.php';
 
 function routeRequest($request, $pdo)
 {
@@ -36,7 +37,7 @@ function routeRequest($request, $pdo)
         return;
     }
 
-    // Category (đặt trước Product để tránh conflict với /products/category/{id})
+    // Category
     if (str_starts_with($request, "/categories")) {
         $controller = new ProductCategoryController($pdo);
         $controller->handleRequest($request);
