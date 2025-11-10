@@ -8,6 +8,9 @@ require_once __DIR__ . '/../controllers/OrderController.php';
 require_once __DIR__ . '/../controllers/ProductController.php';
 require_once __DIR__ . '/../controllers/PostController.php';
 require_once __DIR__ . '/../controllers/CommentController.php';
+require_once __DIR__ . '/../controllers/ContactController.php';
+require_once __DIR__ . '/../controllers/SiteSettingsController.php';
+require_once __DIR__ . '/../controllers/ProductCategoryController.php';
 
 function routeRequest($request, $pdo)
 {
@@ -32,6 +35,13 @@ function routeRequest($request, $pdo)
     // User
     if (str_starts_with($request, "/users")) {
         $controller = new UserController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Category
+    if (str_starts_with($request, "/categories")) {
+        $controller = new ProductCategoryController($pdo);
         $controller->handleRequest($request);
         return;
     }
@@ -74,6 +84,20 @@ function routeRequest($request, $pdo)
     // Comments cho sản phẩm
     if (str_starts_with($request, "/product-comments")) {
         $controller = new CommentController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Contacts
+    if (str_starts_with($request, "/contacts")) {
+        $controller = new ContactController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Site Settings
+    if (str_starts_with($request, "/site-settings")) {
+        $controller = new SiteSettingsController($pdo);
         $controller->handleRequest($request);
         return;
     }

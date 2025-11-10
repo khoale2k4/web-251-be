@@ -86,6 +86,9 @@ class Order {
      * Lấy tất cả đơn hàng (admin)
      */
     public function getAllOrders($limit = 50, $offset = 0, $status = null) {
+        $limit = (int)$limit;
+        $offset = (int)$offset;
+
         if ($status) {
             $stmt = $this->pdo->prepare("
                 SELECT 
@@ -96,9 +99,9 @@ class Order {
                 LEFT JOIN users u ON o.user_id = u.id
                 WHERE o.status = ?
                 ORDER BY o.created_at DESC
-                LIMIT ? OFFSET ?
+                LIMIT $limit OFFSET $offset
             ");
-            $stmt->execute([$status, $limit, $offset]);
+            $stmt->execute([$status]);
         } else {
             $stmt = $this->pdo->prepare("
                 SELECT 
@@ -108,9 +111,9 @@ class Order {
                 FROM orders o
                 LEFT JOIN users u ON o.user_id = u.id
                 ORDER BY o.created_at DESC
-                LIMIT ? OFFSET ?
+                LIMIT $limit OFFSET $offset
             ");
-            $stmt->execute([$limit, $offset]);
+            $stmt->execute();
         }
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

@@ -10,6 +10,8 @@ class UploadController {
 
     public function handleRequest($request) {
         if ($request === "/upload" && $_SERVER["REQUEST_METHOD"] === "POST") {
+            error_log(print_r($_FILES, true));
+
             try {
                 $filename = $this->service->saveFile($_FILES["file"]);
                 echo json_encode([

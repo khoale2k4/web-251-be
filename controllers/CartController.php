@@ -12,9 +12,16 @@ class CartController {
     public function handleRequest($request) {
         $method = $_SERVER['REQUEST_METHOD'];
         
-        // GET /carts - Lấy giỏ hàng của user hiện tại
+        // GET /carts - Lấy giỏ hàng của users
         if ($request === '/carts' && $method === 'GET') {
-            $this->getCart();
+            $this->getCarts();
+            return;
+        }
+
+        // GET /carts - Lấy giỏ hàng của user_id
+        if (preg_match('#^/carts/(\d+)$#', $request, $matches) && $method === 'GET') {
+            $userId = (int)$matches[1];
+            $this->getCart(userId: $userId);
             return;
         }
         
@@ -52,11 +59,23 @@ class CartController {
     /**
      * GET /carts - Lấy giỏ hàng
      */
-    private function getCart() {
-        // Lấy user_id từ query hoặc session
-        // Ở đây tôi giả sử user_id được truyền qua query param hoặc từ authentication middleware
-        $userId = $_GET['user_id'] ?? null;
+    private function getCarts() {
+
+        $result = $this->cartService->getAllCarts();
         
+        if ($result['success']) {
+            http_response_code(200);
+        } else {
+            http_response_code(400);
+        }
+        
+        echo json_encode($result);
+    }
+    
+    /**
+     * GET /carts/user_id - Lấy giỏ hàng
+     */
+    private function getCart($userId) {
         if (!$userId) {
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Thiếu user_id']);

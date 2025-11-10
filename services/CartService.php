@@ -8,6 +8,24 @@ class CartService {
     public function __construct($pdo) {
         $this->cartModel = new Cart($pdo);
     }
+
+    public function getAllCarts() {
+        try {
+        $cart = $this->cartModel->getAllCarts();
+            
+            return [
+                'success' => true,
+                'data' => [
+                    'cart' => $cart,
+                ]
+            ];
+        } catch (Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'Không thể lấy giỏ hàng: ' . $e->getMessage()
+            ];
+        }
+    }
     
     /**
      * Lấy giỏ hàng của user kèm theo các items
