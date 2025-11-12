@@ -11,31 +11,64 @@ class CommentService {
     // Lấy tất cả bình luận (hoặc lọc theo post_id / product_id)
     public function getAll($type = 'post', $filterId = null) {
         if ($type === 'product') {
-            $query = "SELECT c.*, u.name AS user_name, p.name AS product_name 
+            $query = "SELECT c.*, 
+                             u.name AS user_name, 
+                             pr.name AS product_name,
+                             ps.title AS post_title
                       FROM comments c
-                      JOIN users u ON c.user_id = u.id
-                      JOIN products p ON c.product_id = p.id
+                      LEFT JOIN users u ON c.user_id = u.id
+                      LEFT JOIN products pr ON c.product_id = pr.id
+                      LEFT JOIN posts ps ON c.post_id = ps.id
                       WHERE c.comment_type = 'product'";
-            if ($filterId) $query .= " AND c.product_id = :filterId";
+            if ($filterId) {
+                $query .= " AND c.product_id = :filterId";
+            }
         } else {
-            $query = "SELECT c.*, u.name AS user_name, ps.title AS post_title 
+            $query = "SELECT c.*, 
+                             u.name AS user_name, 
+                             ps.title AS post_title,
+                             pr.name AS product_name
                       FROM comments c
-                      JOIN users u ON c.user_id = u.id
-                      JOIN posts ps ON c.post_id = ps.id
+                      LEFT JOIN users u ON c.user_id = u.id
+                      LEFT JOIN posts ps ON c.post_id = ps.id
+                      LEFT JOIN products pr ON c.product_id = pr.id
                       WHERE c.comment_type = 'post'";
-            if ($filterId) $query .= " AND c.post_id = :filterId";
+            if ($filterId) {
+                $query .= " AND c.post_id = :filterId";
+            }
         }
 
+        $query .= " ORDER BY c.created_at DESC";
+
         $stmt = $this->pdo->prepare($query);
-        if ($filterId) $stmt->bindValue(':filterId', $filterId, PDO::PARAM_INT);
+        if ($filterId) {
+            $stmt->bindValue(':filterId', $filterId, PDO::PARAM_INT);
+        }
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Lấy chi tiết 1 bình luận
     public function getById($id) {
         $stmt = $this->pdo->prepare("SELECT * FROM comments WHERE id = ?");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getDetailedById($id) {
+        $stmt = $this->pdo->prepare("
+            SELECT 
+                c.*,
+                u.name AS user_name,
+                ps.title AS post_title,
+                pr.name AS product_name
+            FROM comments c
+            LEFT JOIN users u ON c.user_id = u.id
+            LEFT JOIN posts ps ON c.post_id = ps.id
+            LEFT JOIN products pr ON c.product_id = pr.id
+            WHERE c.id = ?
+            LIMIT 1
+        ");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
