@@ -83,7 +83,7 @@ class ProductService {
     /**
      * Lấy danh sách sản phẩm
      */
-    public function getProducts($page = 1, $limit = 20, $filters = []) {
+    public function getProducts($page = 1, $limit = 10, $filters = []) {
         try {
             $offset = ($page - 1) * $limit;
             $products = $this->productModel->getAll($limit, $offset, $filters);
@@ -183,7 +183,7 @@ class ProductService {
     /**
      * Lấy sản phẩm theo category
      */
-    public function getProductsByCategory($categoryId, $page = 1, $limit = 20) {
+    public function getProductsByCategory($categoryId, $page = 1, $limit = 10) {
         try {
             $offset = ($page - 1) * $limit;
             $products = $this->productModel->getByCategory($categoryId, $limit, $offset);
@@ -233,7 +233,7 @@ class ProductService {
     /**
      * Lấy sản phẩm đang giảm giá
      */
-    public function getDiscountedProducts($page = 1, $limit = 20) {
+    public function getDiscountedProducts($page = 1, $limit = 10) {
         try {
             $offset = ($page - 1) * $limit;
             $products = $this->productModel->getDiscounted($limit, $offset);
@@ -297,7 +297,7 @@ class ProductService {
     /**
      * Tìm kiếm sản phẩm
      */
-    public function searchProducts($keyword, $page = 1, $limit = 20) {
+    public function searchProducts($keyword, $page = 1, $limit = 10) {
         try {
             $offset = ($page - 1) * $limit;
             $filters = ['search' => $keyword];
