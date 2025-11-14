@@ -14,7 +14,7 @@ class CommentController
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        if (preg_match('#^/product-comments#', $request)) {
+        if (preg_match('#product-comments#', $request)) {
             $type = 'product';
         } else {
             $type = 'post';

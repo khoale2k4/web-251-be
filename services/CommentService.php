@@ -11,14 +11,14 @@ class CommentService {
     // Lấy tất cả bình luận (hoặc lọc theo post_id / product_id)
     public function getAll($type = 'post', $filterId = null) {
         if ($type === 'product') {
-            $query = "SELECT c.*, u.name AS user_name, p.name AS product_name 
+            $query = "SELECT c.*, u.name AS user_name, u.avatar AS user_avatar, p.name AS product_name 
                       FROM comments c
                       JOIN users u ON c.user_id = u.id
                       JOIN products p ON c.product_id = p.id
                       WHERE c.comment_type = 'product'";
             if ($filterId) $query .= " AND c.product_id = :filterId";
         } else {
-            $query = "SELECT c.*, u.name AS user_name, ps.title AS post_title 
+            $query = "SELECT c.*, u.name AS user_name, u.avatar AS user_avatar, ps.title AS post_title 
                       FROM comments c
                       JOIN users u ON c.user_id = u.id
                       JOIN posts ps ON c.post_id = ps.id

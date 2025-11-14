@@ -1,27 +1,32 @@
 <?php
 require_once __DIR__ . '/../models/UserModel.php';
 
-class UserService {
+class UserService
+{
     private $userModel;
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         $this->userModel = new UserModel($pdo);
     }
 
     // Lấy tất cả người dùng
-    public function getAllUsers() {
+    public function getAllUsers()
+    {
         return $this->userModel->getAll();
     }
 
     // Lấy người dùng theo ID
-    public function getUserById($id) {
+    public function getUserById($id)
+    {
         return $this->userModel->getById($id);
     }
 
     // Tạo tài khoản mới
-    public function createUser($name, $email, $password, $role = 'member') {
-        if (empty($name) || empty($email) || empty($password)) {
-            throw new Exception("Name, email, and password are required");
+    public function createUser($name, $email, $password, $role = 'member')
+    {
+        if (empty($email) || empty($password)) {
+            throw new Exception("Email, and password are required");
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -35,7 +40,8 @@ class UserService {
     }
 
     // Đăng nhập
-    public function login($email, $password) {
+    public function login($email, $password)
+    {
         if (empty($email) || empty($password)) {
             throw new Exception("Email and password are required");
         }
@@ -59,14 +65,14 @@ class UserService {
     }
 
     // Cập nhật thông tin người dùng
-    public function updateUser($id, $data) {
+    public function updateUser($id, $data)
+    {
         // Chỉ cho phép cập nhật 1 số trường
         $allowedFields = ['name', 'email', 'avatar', 'phone', 'password', 'status', 'role'];
         $updateData = [];
 
         foreach ($allowedFields as $field) {
             if (isset($data[$field]) && $data[$field] !== '') {
-                // Nếu có password mới thì mã hoá lại
                 if ($field === 'password') {
                     $updateData[$field] = password_hash($data[$field], PASSWORD_BCRYPT);
                 } else {
