@@ -378,3 +378,36 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-10-26  9:11:36
+
+/* About-Admin content
+
+
+*/
+CREATE TABLE IF NOT EXISTS page_contents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    home_hero_title VARCHAR(255) NOT NULL DEFAULT '',
+    home_hero_subtitle VARCHAR(255) NOT NULL DEFAULT '',
+    home_hero_button_text VARCHAR(100) NOT NULL DEFAULT '',
+    home_hero_button_link VARCHAR(255) NOT NULL DEFAULT '',
+    home_hero_image VARCHAR(255) NOT NULL DEFAULT '',
+    home_intro_title VARCHAR(255) NOT NULL DEFAULT '',
+    home_intro_text TEXT,
+    about_title VARCHAR(255) NOT NULL DEFAULT '',
+    about_content TEXT,
+    about_image VARCHAR(255) NOT NULL DEFAULT '',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+INSERT INTO page_contents (
+    home_hero_title,
+    home_hero_subtitle,
+    home_hero_button_text,
+    home_hero_button_link,
+    home_hero_image,
+    home_intro_title,
+    home_intro_text,
+    about_title,
+    about_content,
+    about_image
+) VALUES ('','','','','','','','','','');
+
