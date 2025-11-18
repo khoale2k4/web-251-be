@@ -16,3 +16,6 @@ function getPDO() {
         exit;
     }
 }
+
+$pdo = getPDO();
+echo "Connected";
