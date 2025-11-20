@@ -14,8 +14,11 @@ class CommentController
     {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        $isProductRoute = preg_match('#^/product-comments#', $request);
-        $type = $isProductRoute ? 'product' : 'post';
+        if (preg_match('#product-comments#', $request)) {
+            $type = 'product';
+        } else {
+            $type = 'post';
+        }
 
         switch ($method) {
             case 'GET':

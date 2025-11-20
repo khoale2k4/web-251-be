@@ -98,7 +98,7 @@ class ProductController {
      */
     private function getProducts() {
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
         
         $filters = [];
         if (isset($_GET['category_id'])) $filters['category_id'] = (int)$_GET['category_id'];
@@ -221,7 +221,7 @@ class ProductController {
      */
     private function getProductsByCategory($categoryId) {
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
         
         $result = $this->productService->getProductsByCategory($categoryId, $page, $limit);
         
@@ -258,7 +258,7 @@ class ProductController {
      */
     private function getDiscountedProducts() {
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
         
         $result = $this->productService->getDiscountedProducts($page, $limit);
         
@@ -278,7 +278,7 @@ class ProductController {
     private function searchProducts() {
         $keyword = $_GET['q'] ?? '';
         $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 20;
+        $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
         
         if (empty($keyword)) {
             http_response_code(400);
