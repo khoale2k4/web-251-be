@@ -8,34 +8,40 @@ class CommentService {
         $this->pdo = $pdo;
     }
 
-    // Lấy tất cả bình luận (hoặc lọc theo post_id / product_id)
-    public function getAll($type = 'post', $filterId = null) {
+    // Lấy tất cả bình luận từ mới nhất đến cũ nhất (hoặc lọc theo type và filterId)
+    public function getAll($type = null, $filterId = null) {
+        // Query lấy tất cả bình luận với thông tin user, product và post
+        $query = "SELECT 
+                    c.*, 
+                    u.name AS user_name, 
+                    u.avatar AS user_avatar, 
+                    pr.name AS product_name,
+                    ps.title AS post_title
+                  FROM comments c
+                  LEFT JOIN users u ON c.user_id = u.id
+                  LEFT JOIN products pr ON c.product_id = pr.id
+                  LEFT JOIN posts ps ON c.post_id = ps.id
+                  WHERE 1=1";
+        
+        // Lọc theo type nếu có
         if ($type === 'product') {
-            $query = "SELECT c.*, u.name AS user_name, u.avatar AS user_avatar, p.name AS product_name 
-                      FROM comments c
-                      LEFT JOIN users u ON c.user_id = u.id
-                      LEFT JOIN products pr ON c.product_id = pr.id
-                      LEFT JOIN posts ps ON c.post_id = ps.id
-                      WHERE c.comment_type = 'product'";
+            $query .= " AND c.comment_type = 'product'";
             if ($filterId) {
                 $query .= " AND c.product_id = :filterId";
             }
-        } else {
-            $query = "SELECT c.*, u.name AS user_name, u.avatar AS user_avatar, ps.title AS post_title 
-                      FROM comments c
-                      LEFT JOIN users u ON c.user_id = u.id
-                      LEFT JOIN posts ps ON c.post_id = ps.id
-                      LEFT JOIN products pr ON c.product_id = pr.id
-                      WHERE c.comment_type = 'post'";
+        } elseif ($type === 'post') {
+            $query .= " AND c.comment_type = 'post'";
             if ($filterId) {
                 $query .= " AND c.post_id = :filterId";
             }
         }
-
+        // Nếu $type = null hoặc rỗng, lấy tất cả không lọc theo type
+        
+        // Sắp xếp từ mới nhất đến cũ nhất
         $query .= " ORDER BY c.created_at DESC";
 
         $stmt = $this->pdo->prepare($query);
-        if ($filterId) {
+        if ($filterId && ($type === 'product' || $type === 'post')) {
             $stmt->bindValue(':filterId', $filterId, PDO::PARAM_INT);
         }
         $stmt->execute();

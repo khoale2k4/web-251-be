@@ -1,7 +1,23 @@
 <?php
 header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: http://localhost");
-// header("Access-Control-Allow-Origin: http://btl-web.test");
+
+// Allow multiple origins
+$allowedOrigins = [
+    'http://localhost',
+    'http://localhost:3000',
+    'http://localhost:5500',
+    'http://localhost:8080',
+    'http://127.0.0.1',
+    'http://btl-web.test'
+];
+
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    header("Access-Control-Allow-Origin: *");
+}
+
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Access-Control-Allow-Credentials: true");
@@ -22,9 +38,17 @@ $pdo = getPDO();
 // Gọi router
 require_once __DIR__ . '/routes/routes.php';
 
-// Fix routing cho XAMPP
+// Fix routing
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$request = str_replace('/web-251-be-main', '', $uri);
+
+// For PHP built-in server, use URI directly
+// For XAMPP, remove base path
+if (strpos($uri, '/web-251-be') !== false) {
+    $request = str_replace('/web-251-be', '', $uri);
+    $request = str_replace('/index.php', '', $request);
+} else {
+    $request = $uri;
+}
 
 // Nếu không có request path, dùng query string
 if ($request === '' || $request === '/') {
