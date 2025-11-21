@@ -12,13 +12,13 @@ class PostService
     }
 
     /**
-     * Lấy danh sách bài viết (có tìm kiếm & phân trang)
+     * Lấy danh sách bài viết (có tìm kiếm, phân trang, filter status & slug)
      */
-    public function getPosts($page = 1, $limit = 10, $search = null)
+    public function getPosts($page = 1, $limit = 10, $search = null, $status = null, $slug = null)
     {
         try {
             $offset = ($page - 1) * $limit;
-            $data = $this->postModel->getAll($limit, $offset, $search);
+            $data = $this->postModel->getAll($limit, $offset, $search, $status, $slug);
 
             return [
                 'success' => true,

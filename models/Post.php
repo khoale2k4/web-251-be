@@ -10,9 +10,9 @@ class Post
     }
 
     /**
-     * Lấy tất cả bài viết (hỗ trợ tìm kiếm theo title, phân trang)
+     * Lấy tất cả bài viết (hỗ trợ tìm kiếm theo title, phân trang, filter status, slug)
      */
-    public function getAll($limit = 20, $offset = 0, $search = null)
+    public function getAll($limit = 20, $offset = 0, $search = null, $status = null, $slug = null)
     {
         $sql = "
         SELECT 
@@ -25,9 +25,22 @@ class Post
 
         $params = [];
 
+        // Filter by search
         if (!empty($search)) {
             $sql .= " AND p.title LIKE ?";
             $params[] = "%$search%";
+        }
+
+        // Filter by status
+        if (!empty($status)) {
+            $sql .= " AND p.status = ?";
+            $params[] = $status;
+        }
+
+        // Filter by slug
+        if (!empty($slug)) {
+            $sql .= " AND p.slug = ?";
+            $params[] = $slug;
         }
 
         // ✅ Ép kiểu để tránh SQL injection

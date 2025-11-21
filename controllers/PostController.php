@@ -12,11 +12,14 @@ class PostController {
     public function handleRequest($request) {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // GET /posts?page=1&search=abc
+        // GET /posts?page=1&search=abc&status=published&slug=xxx
         if ($request === '/posts' && $method === 'GET') {
             $page = $_GET['page'] ?? 1;
             $search = $_GET['search'] ?? null;
-            echo json_encode($this->postService->getPosts($page, 10, $search));
+            $status = $_GET['status'] ?? null;
+            $slug = $_GET['slug'] ?? null;
+            
+            echo json_encode($this->postService->getPosts($page, 10, $search, $status, $slug));
             return;
         }
 
