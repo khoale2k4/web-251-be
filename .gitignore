@@ -88,8 +88,8 @@ coverage/
 
 #SQL
 /config/database.php
-web.sql
-data.sql
+# web.sql
+# data.sql
 
 #Swagger
 swagger.json
