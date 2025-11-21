@@ -79,6 +79,8 @@ class PostService
                 'excerpt' => $data['excerpt'] ?? null,
                 'image' => $data['image'] ?? null,
                 'author_id' => $data['author_id'] ?? null,
+                'status' => $data['status'] ?? 'draft',
+                'published_at' => $data['published_at'] ?? null,
             ];
 
             $postId = $this->postModel->create($payload);
@@ -150,7 +152,13 @@ class PostService
                     : $existingPost['image'],
                 'author_id' => isset($data['author_id']) && !empty($data['author_id'])
                     ? (int)$data['author_id']
-                    : $existingPost['author_id']
+                    : $existingPost['author_id'],
+                'status' => isset($data['status']) && trim($data['status']) !== ''
+                    ? trim($data['status'])
+                    : ($existingPost['status'] ?? 'draft'),
+                'published_at' => array_key_exists('published_at', $data)
+                    ? $data['published_at']
+                    : $existingPost['published_at']
             ];
 
             // Cập nhật vào DB

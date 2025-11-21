@@ -28,15 +28,28 @@ class UploadService {
             throw new Exception("Invalid upload source");
         }
 
-        $allowedMime = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $detectedMime = mime_content_type($file['tmp_name']);
-        if (!in_array($detectedMime, $allowedMime, true)) {
-            throw new Exception("Chỉ hỗ trợ upload ảnh (jpg, png, gif, webp)");
-        }
-
+        // Get file extension
         $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
-            $extension = $this->mimeToExtension($detectedMime) ?? 'jpg';
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        
+        // Check extension first
+        if (!in_array($extension, $allowedExtensions, true)) {
+            throw new Exception("Chỉ hỗ trợ upload ảnh (jpg, jpeg, png, gif, webp). File extension: " . $extension);
+        }
+        
+        // Detect MIME type for additional security
+        $detectedMime = $this->detectMimeType($file['tmp_name']);
+        $allowedMime = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/jpg'];
+        
+        // Log for debugging
+        error_log("Upload - File: " . $file['name'] . ", Extension: " . $extension . ", MIME: " . $detectedMime);
+        
+        // Accept if either MIME is valid OR extension is valid (more permissive)
+        $mimeValid = in_array($detectedMime, $allowedMime, true);
+        $extValid = in_array($extension, $allowedExtensions, true);
+        
+        if (!$mimeValid && !$extValid) {
+            throw new Exception("Invalid file type. Extension: " . $extension . ", MIME: " . $detectedMime);
         }
 
         $safeFolder = $this->sanitizeFolder($folder);
@@ -101,5 +114,49 @@ class UploadService {
             'image/webp' => 'webp'
         ];
         return $map[$mime] ?? null;
+    }
+
+    /**
+     * Detect MIME type using multiple methods for compatibility
+     * @param string $filePath Path to uploaded file
+     * @return string MIME type
+     */
+    private function detectMimeType($filePath) {
+        // Method 1: finfo (most reliable, PHP 5.3+)
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo) {
+                $mime = finfo_file($finfo, $filePath);
+                finfo_close($finfo);
+                if ($mime) {
+                    return $mime;
+                }
+            }
+        }
+        
+        // Method 2: mime_content_type (deprecated but still works)
+        if (function_exists('mime_content_type')) {
+            $mime = mime_content_type($filePath);
+            if ($mime) {
+                return $mime;
+            }
+        }
+        
+        // Method 3: Check file extension as fallback
+        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $extToMime = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp'
+        ];
+        
+        if (isset($extToMime[$extension])) {
+            return $extToMime[$extension];
+        }
+        
+        // Default fallback
+        return 'application/octet-stream';
     }
 }

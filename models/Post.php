@@ -65,8 +65,8 @@ class Post
     public function create($data)
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO posts (title, slug, content, excerpt, image, author_id)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO posts (title, slug, content, excerpt, image, author_id, status, published_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
             $data['title'],
@@ -74,7 +74,9 @@ class Post
             $data['content'] ?? null,
             $data['excerpt'] ?? null,
             $data['image'] ?? null,
-            $data['author_id'] ?? null
+            $data['author_id'] ?? null,
+            $data['status'] ?? 'draft',
+            $data['published_at'] ?? null
         ]);
 
         return $this->pdo->lastInsertId();
@@ -87,7 +89,7 @@ class Post
     {
         $stmt = $this->pdo->prepare("
             UPDATE posts
-            SET title = ?, slug = ?, content = ?, excerpt = ?, image = ?, author_id = ?, updated_at = NOW()
+            SET title = ?, slug = ?, content = ?, excerpt = ?, image = ?, author_id = ?, status = ?, published_at = ?, updated_at = NOW()
             WHERE id = ?
         ");
         return $stmt->execute([
@@ -97,6 +99,8 @@ class Post
             $data['excerpt'] ?? null,
             $data['image'] ?? null,
             $data['author_id'] ?? null,
+            $data['status'] ?? 'draft',
+            $data['published_at'] ?? null,
             $id
         ]);
     }
