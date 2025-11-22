@@ -11,6 +11,7 @@ require_once __DIR__ . '/../controllers/CommentController.php';
 require_once __DIR__ . '/../controllers/ContactController.php';
 require_once __DIR__ . '/../controllers/SiteSettingsController.php';
 require_once __DIR__ . '/../controllers/ProductCategoryController.php';
+require_once __DIR__ . '/../controllers/SchedulerController.php';
 
 function routeRequest($request, $pdo)
 {
@@ -98,6 +99,13 @@ function routeRequest($request, $pdo)
     // Site Settings
     if (str_starts_with($request, "/site-settings")) {
         $controller = new SiteSettingsController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Scheduler - Auto update scheduled posts
+    if (str_starts_with($request, "/scheduler")) {
+        $controller = new SchedulerController($pdo);
         $controller->handleRequest($request);
         return;
     }

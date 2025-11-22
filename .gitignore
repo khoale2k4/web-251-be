@@ -75,7 +75,7 @@ coverage/
 /tmp/
 
 # Database
-*.sql
+# *.sql
 *.sqlite
 
 # Secrets
