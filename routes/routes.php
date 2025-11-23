@@ -13,6 +13,7 @@ require_once __DIR__ . '/../controllers/SiteSettingsController.php';
 require_once __DIR__ . '/../controllers/ProductCategoryController.php';
 require_once __DIR__ . '/../controllers/PageController.php';
 require_once __DIR__ . '/../controllers/SchedulerController.php';
+require_once __DIR__ . '/../controllers/PasswordResetController.php';
 
 function routeRequest($request, $pdo)
 {
@@ -114,6 +115,13 @@ function routeRequest($request, $pdo)
     if (str_starts_with($request, "/page-contents")) {
         $controller = new PageController($pdo);
         $controller->handleRequest($request);
+        return;
+    }
+
+    // Password Reset Requests
+    if (str_starts_with($request, "/password-reset")) {
+        $controller = new PasswordResetController($pdo);
+        $controller->handleRequest($request, $_SERVER["REQUEST_METHOD"]);
         return;
     }
 
