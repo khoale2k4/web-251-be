@@ -19,7 +19,18 @@ class UserController
 
         try {
             if ($request === "/users" && $method === "GET") {
-                echo json_encode($this->service->getAllUsers());
+                $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+                $limit = isset($_GET['limit']) ? (int) $_GET['limit'] : 10;
+                $search = $_GET['search'] ?? '';
+                $status = $_GET['status'] ?? null;
+
+                $result = $this->service->getAllUsers($page, $limit, [
+                    'search' => $search,
+                    'status' => $status
+                ]);
+
+                http_response_code(200);
+                echo json_encode($result);
             }
 
             elseif (preg_match("/\/users\/(\d+)/", $request, $matches) && $method === "GET") {
@@ -49,6 +60,16 @@ class UserController
                     "success" => true,
                     "user" => $user
                 ]);
+            }
+
+            elseif (preg_match("/\/users\/(\d+)\/status/", $request, $matches) && $method === "PATCH") {
+                $id = (int) $matches[1];
+                $data = json_decode(file_get_contents("php://input"), true);
+                $status = $data["status"] ?? null;
+
+                $result = $this->service->updateUserStatus($id, $status);
+                http_response_code(200);
+                echo json_encode($result);
             }
 
             elseif (preg_match("/\/users\/(\d+)/", $request, $matches) && $method === "PUT") {
