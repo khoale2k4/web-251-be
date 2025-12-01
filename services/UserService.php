@@ -10,10 +10,38 @@ class UserService
         $this->userModel = new UserModel($pdo);
     }
 
-    // Lấy tất cả người dùng
-    public function getAllUsers()
+    // Lấy tất cả người dùng (hỗ trợ phân trang, tìm kiếm)
+    public function getAllUsers($page = 1, $limit = 10, $filters = [])
     {
-        return $this->userModel->getAll();
+        $page = max(1, (int) $page);
+        $limit = max(1, min(50, (int) $limit));
+        $search = isset($filters['search']) ? trim($filters['search']) : '';
+        $status = isset($filters['status']) ? strtolower(trim($filters['status'])) : null;
+
+        if ($status !== null && $status !== '' && !in_array($status, ['active', 'banned'])) {
+            throw new Exception("Invalid status filter");
+        }
+
+        $result = $this->userModel->getPaginatedUsers(
+            $page,
+            $limit,
+            $search,
+            $status !== '' ? $status : null
+        );
+
+        $totalPages = $limit > 0 ? (int) ceil($result['total'] / $limit) : 1;
+
+        return [
+            'success' => true,
+            'data' => $result['users'],
+            'pagination' => [
+                'page' => $page,
+                'limit' => $limit,
+                'total' => $result['total'],
+                'total_pages' => max(1, $totalPages)
+            ],
+            'stats' => $result['stats'] ?? null
+        ];
     }
 
     // Lấy người dùng theo ID
@@ -107,4 +135,27 @@ class UserService
         return $this->userModel->update($id, $updateData);
     }
 
+    public function updateUserStatus($id, $status)
+    {
+        $status = strtolower(trim($status ?? ''));
+        $allowed = ['active', 'banned'];
+
+        if (!in_array($status, $allowed)) {
+            throw new Exception("Invalid status value");
+        }
+
+        $updated = $this->userModel->updateStatus($id, $status);
+        if (!$updated) {
+            throw new Exception("User not found or status unchanged");
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Cập nhật trạng thái thành công',
+            'data' => [
+                'id' => (int) $id,
+                'status' => $status
+            ]
+        ];
+    }
 }
