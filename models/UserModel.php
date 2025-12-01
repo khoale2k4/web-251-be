@@ -91,14 +91,22 @@ class UserModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // Lấy người dùng theo username
+    public function getByUsername($username)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE name = ?");
+        $stmt->execute([$username]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     // Tạo người dùng mới
-    public function create($name, $email, $password, $role = 'member')
+    public function create($name, $email, $password, $role = 'member', $phone = null)
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO users (name, email, password, role, created_at)
-            VALUES (?, ?, ?, ?, NOW())
+            INSERT INTO users (name, email, password, role, phone, created_at)
+            VALUES (?, ?, ?, ?, ?, NOW())
         ");
-        $stmt->execute([$name, $email, $password, $role]);
+        $stmt->execute([$name, $email, $password, $role, $phone]);
         return $this->pdo->lastInsertId();
     }
 
@@ -127,10 +135,61 @@ class UserModel
         return $stmt->execute([$id]);
     }
 
-    public function updateStatus($id, $status)
+    // ============ PASSWORD RESET METHODS ============
+
+    /**
+     * Reset password về default và bắt buộc đổi mật khẩu
+     * 
+     * @param int $userId ID người dùng
+     * @param string $defaultPassword Password mặc định (đã hash)
+     * @return bool
+     */
+    public function resetToDefaultPassword($userId, $defaultPassword)
     {
-        $stmt = $this->pdo->prepare("UPDATE users SET status = ?, updated_at = NOW() WHERE id = ?");
-        $stmt->execute([$status, $id]);
-        return $stmt->rowCount() > 0;
+        $stmt = $this->pdo->prepare("
+            UPDATE users 
+            SET password = ?,
+                must_change_password = TRUE,
+                last_password_change = NOW(),
+                updated_at = NOW()
+            WHERE id = ?
+        ");
+        return $stmt->execute([$defaultPassword, $userId]);
+    }
+
+    /**
+     * Cập nhật mật khẩu mới (sau khi user đổi)
+     * 
+     * @param int $userId ID người dùng
+     * @param string $hashedPassword Mật khẩu đã hash
+     * @return bool
+     */
+    public function updatePassword($userId, $hashedPassword)
+    {
+        $stmt = $this->pdo->prepare("
+            UPDATE users 
+            SET password = ?,
+                must_change_password = FALSE,
+                last_password_change = NOW(),
+                updated_at = NOW()
+            WHERE id = ?
+        ");
+        return $stmt->execute([$hashedPassword, $userId]);
+    }
+
+    /**
+     * Kiểm tra user có bắt buộc đổi mật khẩu không
+     * 
+     * @param int $userId ID người dùng
+     * @return bool
+     */
+    public function mustChangePassword($userId)
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT must_change_password FROM users WHERE id = ?
+        ");
+        $stmt->execute([$userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? (bool)$result['must_change_password'] : false;
     }
 }

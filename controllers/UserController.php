@@ -45,7 +45,8 @@ class UserController
                     $data["name"] ?? "",
                     $data["email"] ?? "",
                     $data["password"] ?? "",
-                    $data["role"] ?? "member"
+                    $data["role"] ?? "member",
+                    $data["phone"] ?? null
                 );
                 echo json_encode(["success" => true, "id" => $id]);
             }
