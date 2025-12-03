@@ -60,8 +60,8 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // For PHP built-in server, use URI directly
 // For XAMPP, remove base path
-if (strpos($uri, '/web-251-be') !== false) {
-    $request = str_replace('/web-251-be', '', $uri);
+if (strpos($uri, '/be') !== false) {
+    $request = str_replace('/be', '', $uri);
     $request = str_replace('/index.php', '', $request);
 } else {
     $request = $uri;

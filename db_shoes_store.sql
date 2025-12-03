@@ -332,3 +332,27 @@ INSERT INTO `users` VALUES (9, 'Test User', 'testuser@example.com', 'Password123
 INSERT INTO `users` VALUES (10, 'Alice Nguyen', 'alice.nguyen@example.com', 'Password123!', 'member', 'avatars/alice.png', '0966554433', 'active', '2025-10-18 21:06:27', '2025-10-19 21:06:27');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- 
+CREATE TABLE `about_sections` (
+  `id` int(11) NOT NULL,
+  `title` varchar(150) NOT NULL,
+  `subtitle` varchar(255) DEFAULT NULL,
+  `description` text DEFAULT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
+  `sort_order` tinyint(4) NOT NULL DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `about_sections`
+--
+
+INSERT INTO `about_sections` (`id`, `title`, `subtitle`, `description`, `image_url`, `sort_order`, `created_at`, `updated_at`) VALUES
+(1, 'Câu chuyện thương hiệu', 'Giày tốt cho mọi bước chân', 'Mô tả ngắn...', '/uploads/about/story.jpg', 1, '2025-12-01 21:44:56', '2025-12-01 21:44:56'),
+(2, 'Giá trị cốt lõi', 'Chất lượng – Thoải mái – Phong cách', 'Mô tả ngắn...', '/uploads/about/core-values.jpg', 2, '2025-12-01 21:44:56', '2025-12-01 21:44:56'),
+(3, 'Đội ngũ & dịch vụ', 'Đồng hành cùng khách hàng', 'Mô tả ngắn...', '/uploads/about/team.jpg', 3, '2025-12-01 21:44:56', '2025-12-01 21:44:56');
+
+
+
