@@ -14,6 +14,8 @@ require_once __DIR__ . '/../controllers/ProductCategoryController.php';
 require_once __DIR__ . '/../controllers/PageController.php';
 require_once __DIR__ . '/../controllers/SchedulerController.php';
 require_once __DIR__ . '/../controllers/PasswordResetController.php';
+require_once __DIR__ . '/../controllers/FAQController.php';
+require_once __DIR__ . '/../controllers/AboutSectionController.php';
 
 function routeRequest($request, $pdo)
 {
@@ -117,6 +119,23 @@ function routeRequest($request, $pdo)
         $controller->handleRequest($request);
         return;
     }
+    // FAQs
+    if (str_starts_with($request, "/faqs")) {
+        $controller = new FAQController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
+        // About sections (Giới thiệu) - public + admin
+    if (
+        str_starts_with($request, "/about-sections") ||
+        str_starts_with($request, "/admin/about-sections")
+    ) {
+        $controller = new AboutSectionController($pdo);
+        $controller->handleRequest($request);
+        return;
+    }
+
 
     // Password Reset Requests
     if (str_starts_with($request, "/password-reset")) {
@@ -128,4 +147,6 @@ function routeRequest($request, $pdo)
     // Không khớp controller nào
     http_response_code(404);
     echo json_encode(["error" => "Not found"]);
+
+    
 }
