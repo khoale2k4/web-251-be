@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../controllers/HealthCheckController.php';
 require_once __DIR__ . '/../controllers/UploadController.php';
+require_once __DIR__ . '/../controllers/StorageController.php';
 require_once __DIR__ . '/../controllers/UserController.php';
 require_once __DIR__ . '/../controllers/CartController.php';
 require_once __DIR__ . '/../controllers/OrderController.php';
@@ -33,6 +34,13 @@ function routeRequest($request, $pdo)
     // Upload
     if (str_starts_with($request, "/upload")) {
         $controller = new UploadController();
+        $controller->handleRequest($request);
+        return;
+    }
+
+    // Storage - Serve images
+    if (str_starts_with($request, "/storage")) {
+        $controller = new StorageController();
         $controller->handleRequest($request);
         return;
     }

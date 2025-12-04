@@ -1,22 +1,16 @@
 <?php
 
 class UploadService {
-    private $defaultStoragePath;
-    private $assetsBasePath;
+    private $storageBasePath;
     private $publicBasePath;
 
     public function __construct($storagePath = __DIR__ . "/../storage") {
-        $this->defaultStoragePath = $storagePath;
-        if (!file_exists($this->defaultStoragePath)) {
-            mkdir($this->defaultStoragePath, 0777, true);
-        }
-
-        $projectRoot = realpath(dirname(__DIR__)); // .../web-251-be
-        $baseRoot = realpath($projectRoot . '/..'); // .../btl-251-web
-        $this->assetsBasePath = $baseRoot . '/web-251-fe/assets/uploads';
-        $this->publicBasePath = 'assets/uploads';
-        if (!file_exists($this->assetsBasePath)) {
-            mkdir($this->assetsBasePath, 0777, true);
+        // Lưu tất cả ảnh vào be/storage/uploads/
+        $this->storageBasePath = $storagePath . '/uploads';
+        $this->publicBasePath = '/storage/uploads';
+        
+        if (!file_exists($this->storageBasePath)) {
+            mkdir($this->storageBasePath, 0777, true);
         }
     }
 
@@ -53,9 +47,7 @@ class UploadService {
         }
 
         $safeFolder = $this->sanitizeFolder($folder);
-        $targetDir = $toAssets
-            ? $this->ensureAssetsDirectory($safeFolder)
-            : $this->defaultStoragePath;
+        $targetDir = $this->ensureStorageDirectory($safeFolder);
 
         $basename = $this->slugify(pathinfo($file['name'], PATHINFO_FILENAME));
         $filename = $this->uniqueFilename($targetDir, $basename, $extension);
@@ -65,9 +57,10 @@ class UploadService {
             throw new Exception("Cannot move uploaded file");
         }
 
+        // Return relative path for API response: /storage/uploads/{folder}/{filename}
         return [
             'filename' => $filename,
-            'relativePath' => $toAssets ? $this->publicBasePath . '/' . $safeFolder . '/' . $filename : $filename,
+            'relativePath' => $this->publicBasePath . '/' . $safeFolder . '/' . $filename,
             'mime' => $detectedMime
         ];
     }
@@ -78,8 +71,8 @@ class UploadService {
         return $folder ?: 'misc';
     }
 
-    private function ensureAssetsDirectory($folder) {
-        $path = $this->assetsBasePath . '/' . $folder;
+    private function ensureStorageDirectory($folder) {
+        $path = $this->storageBasePath . '/' . $folder;
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
