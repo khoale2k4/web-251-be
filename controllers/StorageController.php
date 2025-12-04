@@ -33,9 +33,15 @@ class StorageController {
         }
 
         if (!file_exists($realPath) || !is_file($realPath)) {
-            http_response_code(404);
-            echo json_encode(["error" => "File not found"]);
-            exit;
+            // Fallback to placeholder image
+            $placeholderPath = $this->storagePath . '/no-img.jpg';
+            if (file_exists($placeholderPath) && is_file($placeholderPath)) {
+                $realPath = $placeholderPath;
+            } else {
+                http_response_code(404);
+                echo json_encode(["error" => "File not found: " . $path]);
+                exit;
+            }
         }
 
         // Xác định MIME type
