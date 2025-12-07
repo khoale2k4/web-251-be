@@ -335,7 +335,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- 
 CREATE TABLE `about_sections` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(150) NOT NULL,
   `subtitle` varchar(255) DEFAULT NULL,
   `description` text DEFAULT NULL,
@@ -346,13 +346,59 @@ CREATE TABLE `about_sections` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Đang đổ dữ liệu cho bảng `about_sections`
+-- dữ liệu cho bảng `about_sections`
 --
 
-INSERT INTO `about_sections` (`id`, `title`, `subtitle`, `description`, `image_url`, `sort_order`, `created_at`, `updated_at`) VALUES
-(1, 'Câu chuyện thương hiệu', 'Giày tốt cho mọi bước chân', 'Mô tả ngắn...', '/uploads/about/story.jpg', 1, '2025-12-01 21:44:56', '2025-12-01 21:44:56'),
-(2, 'Giá trị cốt lõi', 'Chất lượng – Thoải mái – Phong cách', 'Mô tả ngắn...', '/uploads/about/core-values.jpg', 2, '2025-12-01 21:44:56', '2025-12-01 21:44:56'),
-(3, 'Đội ngũ & dịch vụ', 'Đồng hành cùng khách hàng', 'Mô tả ngắn...', '/uploads/about/team.jpg', 3, '2025-12-01 21:44:56', '2025-12-01 21:44:56');
+INSERT INTO about_sections
+    (title, subtitle, description, image_url, sort_order)
+VALUES
+-- 1. Giới thiệu chung
+('Về Sneaker Runner',
+ 'Website bán giày thể thao cho người yêu chạy bộ',
+ 'Sneaker Runner là dự án web bán giày thể thao được xây dựng bởi sinh viên Bách khoa,
+ nhằm mang lại trải nghiệm mua sắm đơn giản, hiện đại và phù hợp với người mới lẫn vận động viên.',
+ 'https://www.pngmart.com/files/21/Adidas-Shoes-PNG-HD.png',
+ 1),
 
+-- 2. Câu chuyện thương hiệu
+('Câu chuyện bắt đầu từ một đôi giày',
+ 'Từ niềm đam mê chạy bộ đến dự án web',
+ 'Tụi mình bắt đầu từ nhu cầu rất đơn giản: tìm một đôi giày tốt với giá hợp lý mà thông tin rõ ràng.
+ Từ đó ý tưởng xây dựng một website riêng ra đời, nơi mọi người có thể xem hình ảnh, thông số và cảm hứng chạy bộ.',
+ 'https://www.pngmart.com/files/21/Adidas-Shoes-PNG-Pic.png',
+ 2),
+
+-- 3. Dòng giày chạy bộ nổi bật
+('Giày chạy bộ hiệu năng cao',
+ 'Tập trung vào độ êm, độ bám và độ bền',
+ 'Các mẫu giày được chọn lọc dựa trên tiêu chí: êm chân khi chạy đường dài, đế bám tốt và bền theo thời gian.
+ Mỗi sản phẩm đều có mô tả chi tiết để bạn dễ so sánh và chọn mẫu phù hợp với thói quen luyện tập.',
+ 'https://www.pngmart.com/files/21/Adidas-Shoes-PNG-File.png',
+ 3),
+
+-- 4. Chọn size và tư vấn phù hợp
+('Hướng dẫn chọn size chuẩn',
+ 'Giảm tối đa tình trạng mang không vừa',
+ 'Trang sản phẩm cung cấp bảng quy đổi size, độ dài bàn chân gợi ý và một số mẹo thử giày.
+ Nếu vẫn phân vân, bạn có thể gửi câu hỏi ở trang FAQ hoặc liên hệ trực tiếp để được tư vấn thêm.',
+ 'https://images.pexels.com/photos/34400923/pexels-photo-34400923.jpeg?cs=srgb&dl=pexels-pexels-user-2154522149-34400923.jpg&fm=jpg',
+ 4),
+
+-- 5. Thiết kế và công nghệ đệm
+('Công nghệ đệm và chất liệu',
+ 'Tối ưu cho luyện tập hằng ngày',
+ 'Các mẫu giày trên website ưu tiên phần đệm hấp thụ lực tốt, thân giày thoáng khí và trọng lượng nhẹ.
+ Thông tin về chất liệu, kiểu đế và độ linh hoạt được ghi rõ để bạn hiểu chính xác đôi giày mình chọn.',
+ 'https://images.pexels.com/photos/1537671/pexels-photo-1537671.jpeg?cs=srgb&dl=pexels-craytive-1537671.jpg&fm=jpg',
+ 5),
+
+-- 6. Cam kết và dịch vụ
+('Cam kết chất lượng và hỗ trợ',
+ 'Đồng hành cùng bạn trên từng bước chạy',
+ 'Chúng tôi cam kết chỉ giới thiệu những mẫu giày có nguồn gốc rõ ràng, thông tin minh bạch
+ và luôn lắng nghe phản hồi từ người dùng để cải thiện website. Mục tiêu là trở thành nơi bạn nghĩ đến
+ đầu tiên khi cần tìm giày chạy bộ mới.',
+ 'https://images.pexels.com/photos/12879628/pexels-photo-12879628.jpeg?cs=srgb&dl=pexels-perfect-lens-12879628.jpg&fm=jpg',
+ 6);
 
 

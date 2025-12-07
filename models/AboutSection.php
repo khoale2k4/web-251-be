@@ -114,6 +114,7 @@ class AboutSection
             ':image_url'   => isset($data['image_url']) ? $data['image_url'] : null,
             ':sort_order'  => isset($data['sort_order']) ? (int)$data['sort_order'] : 0,
         ]);
+        return $stmt->rowCount() > 0;
     }
 
     /**
@@ -123,5 +124,6 @@ class AboutSection
     {
         $stmt = $this->pdo->prepare("DELETE FROM about_sections WHERE id = :id");
         return $stmt->execute([':id' => $id]);
+        return $stmt->rowCount() > 0;
     }
 }
