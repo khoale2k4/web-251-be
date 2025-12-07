@@ -1,0 +1,40 @@
+be/
+├── README.md                       # Tài liệu mô tả cách cài đặt và chạy dự án backend
+├── config/                         # Chứa các tệp cấu hình hệ thống
+│   ├── database.php                # Cấu hình kết nối cơ sở dữ liệu (PDO)
+│   └── mailtrap.php                # Cấu hình gửi email thử nghiệm qua Mailtrap
+├── controllers/                    # Controller xử lý request và gọi service tương ứng
+│   ├── AboutSectionController.php
+│   ├── CartController.php
+│   ├── CommentController.php
+│   └── ...                         # Các controller khác
+├── cron/                           # Tác vụ chạy theo lịch (cron jobs)
+│   └── update_scheduled_posts.php  # Job tự động đăng bài theo lịch hẹn
+├── db_shoes_store.sql              # File chứa schema và dữ liệu mẫu của cơ sở dữ liệu
+├── index.php                       # Entry point, thiết lập CORS, load router và xử lý request
+├── middlewares/                    # Middleware xử lý trước/ sau request
+│   ├── AuthMiddleware.php          # Middleware xác thực người dùng
+│   └── LoggerMiddleware.php        # Middleware ghi log request
+├── migrations/                     # Tệp SQL thay đổi cấu trúc database
+│   └── create_password_reset_requests.sql
+├── models/                         # Lớp model tương ứng với các bảng trong database
+│   ├── AboutSection.php
+│   ├── Cart.php
+│   ├── Comment.php
+│   └── ...                         # Các model khác
+├── routes/
+│   └── routes.php                  # Định nghĩa tuyến API và ánh xạ vào controller
+├── server.php                      # Router của PHP built-in server; chặn truy cập file nhạy cảm
+├── services/                       # Lớp xử lý nghiệp vụ (business logic)
+│   ├── AboutSectionService.php
+│   ├── CartService.php
+│   ├── CommentService.php
+│   └── ...                         # Các service khác
+├── storage/                        # Thư mục chứa tài nguyên công khai (hình ảnh, file upload)
+│   ├── story.jpg
+│   ├── team.jpg
+│   └── ...
+└── utils/                          # Helper dùng chung trong dự án
+    ├── ResponseHelper.php
+
+

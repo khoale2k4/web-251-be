@@ -114,7 +114,6 @@ class ProductService {
      */
     public function updateProduct($id, $data) {
         try {
-            // Kiểm tra sản phẩm có tồn tại không
             if (!$this->productModel->exists($id)) {
                 return [
                     'success' => false,
@@ -122,7 +121,6 @@ class ProductService {
                 ];
             }
             
-            // Validate price nếu có
             if (isset($data['price']) && $data['price'] < 0) {
                 return [
                     'success' => false,
@@ -130,7 +128,6 @@ class ProductService {
                 ];
             }
             
-            // Validate discount nếu có
             if (isset($data['discount']) && ($data['discount'] < 0 || $data['discount'] > 100)) {
                 return [
                     'success' => false,

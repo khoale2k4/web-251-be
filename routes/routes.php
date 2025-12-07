@@ -23,6 +23,13 @@ function routeRequest($request, $pdo)
         exit;
     }
 
+
+    if (str_contains($request, '..')) {
+        http_response_code(400);
+        echo "400 Bad Request";
+        exit;
+    }
+
     // Health check
     if ($request === "/" && $_SERVER["REQUEST_METHOD"] === "GET") {
         $controller = new HealthCheckController();
