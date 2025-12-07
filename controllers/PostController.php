@@ -12,14 +12,15 @@ class PostController {
     public function handleRequest($request) {
         $method = $_SERVER['REQUEST_METHOD'];
 
-        // GET /posts?page=1&search=abc&status=published&slug=xxx
+        // GET /posts?page=1&search=abc&status=published&slug=xxx&limit=10
         if ($request === '/posts' && $method === 'GET') {
             $page = $_GET['page'] ?? 1;
+            $limit = $_GET['limit'] ?? 100; // Tăng mặc định lên 100 cho admin
             $search = $_GET['search'] ?? null;
             $status = $_GET['status'] ?? null;
             $slug = $_GET['slug'] ?? null;
             
-            echo json_encode($this->postService->getPosts($page, 10, $search, $status, $slug));
+            echo json_encode($this->postService->getPosts($page, $limit, $search, $status, $slug));
             return;
         }
 
