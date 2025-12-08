@@ -71,7 +71,7 @@ coverage/
 .phpunit/
 
 # Uploaded files / temp
-/storage/uploads/
+
 /tmp/
 
 # Database
