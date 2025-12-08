@@ -20,6 +20,8 @@ require_once __DIR__ . '/../controllers/AboutSectionController.php';
 
 function routeRequest($request, $pdo)
 {
+
+    usleep(500000);
     if ($request === "/favicon.ico") {
         exit;
     }
